@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background: #000; /* Dark background */
+            color: #fff;
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(20, 20, 20, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Neon text and border effect */
+        .neon-border {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 3px solid #ff007f; /* Neon border */
+            box-shadow: 0 0 15px #ff007f, 0 0 25px #ff007f, 0 0 35px #ff007f, 0 0 45px #ff007f;
+            color: white;
+            font-weight: bold;
+            background-color: rgba(25, 25, 25, 0.9);
+        }
+
+        /* Title with neon effect */
+        .title {
+            font-size: 2.5rem;
+            color: #ff007f; /* Neon pink */
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: glow 1.5s ease-in-out infinite alternate;
+            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
+        }
+
+        /* Upper bottom text styling */
+        .upper-bottom-text {
+            font-size: 1.5rem; /* Adjust font size as needed */
+            color: #ff007f; /* Neon pink */
+            margin: 20px 0; /* Space above and below */
+            animation: glow 1.5s ease-in-out infinite alternate;
+            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
+        }
+
+        /* History box styling */
+        .history {
+            width: 92%; /* Adjusted width to 92% */
+            max-height: 150px;
+            overflow-y: auto;
+            border: 3px solid #ff007f;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: rgba(20, 20, 20, 0.9);
+            box-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            margin: 5px 0;
+            color: #fff;
+            background-color: rgba(40, 40, 40, 0.8);
+            border-radius: 4px;
+        }
+
+        /* Neon effect for footer text */
+        .footer-text {
+            font-size: 1.2rem;
+            color: #ff007f; /* Neon pink */
+            margin-top: 20px;
+            animation: glow 1.5s ease-in-out infinite alternate;
+            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
+        }
+
+        /* Neon particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #ff007f, transparent);
+            border-radius: 50%;
+            animation: float 5s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        /* Particle floating animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(-30px) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Particle movement animation */
+        @keyframes move {
+            from {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Title neon glow animation */
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
+            }
+            to {
+                text-shadow: 0 0 20px #ff007f, 0 0 30px #ff007f, 0 0 40px #ff007f;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="particles"></div>
+
+    <div class="container">
+        <div class="title">IVAR ULTIMATE</div>
+
+        <div class="upper-bottom-text">1 MIN WINGO</div> <!-- New upper bottom text -->
+
+        <div class="neon-border">Period Number: <span id="periodNumber">Loading...</span></div>
+        <div class="neon-border">Timer: <span id="timer">00 : 00</span></div>
+        <div class="neon-border">Result: <span id="result">Waiting...</span></div>
+
+        <div class="history">
+            <strong>History</strong>
+            <div id="historyList"></div>
+        </div>
+
+        <!-- Footer Text -->
+        <div class="footer-text">PRESENT BY IVAR</div>
+    </div>
+
+    <script>
+        const periodNumber = document.getElementById("periodNumber");
+        const timerDisplay = document.getElementById("timer");
+        const resultDisplay = document.getElementById("result");
+        const historyList = document.getElementById("historyList");
+
+        const resultsArray = ["SMALL", "SMALL", "BIG", "SMALL", "SMALL", "BIG", "BIG", "BIG", "BIG", "SMALL", "BIG", "SMALL", "BIG", "SMALL", "SMALL", "SMALL"];
+        let lastPeriod = null;
+
+        // Function to update period and display result
+        function updatePeriodAndResult() {
+            const now = new Date();
+            const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+            const period = 10001 + totalMinutes;
+            const newPeriodNumber = `${now.toISOString().slice(0, 10).replace(/-/g, '')}1000${period}`;
+
+            if (newPeriodNumber !== lastPeriod) {
+                lastPeriod = newPeriodNumber;
+                periodNumber.textContent = newPeriodNumber;
+
+                // Randomly select a result for each new period
+                const randomIndex = Math.floor(Math.random() * resultsArray.length);
+                const result = resultsArray[randomIndex];
+                resultDisplay.textContent = result;
+
+                // Add result to history
+                const historyItem = document.createElement("div");
+                historyItem.className = "history-item";
+                historyItem.innerHTML = `<span>Period: ${newPeriodNumber}</span><span>Result: ${result}</span>`;
+                historyList.prepend(historyItem);
+            }
+        }
+
+        // Timer update function
+        function updateTimer() {
+            const now = new Date();
+            const seconds = now.getUTCSeconds();
+            const remainingSeconds = 60 - seconds;
+            timerDisplay.textContent = `00 : ${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds}`;
+        }
+
+        // Run update every second
+        setInterval(() => {
+            updateTimer();
+            if (new Date().getUTCSeconds() === 0) {
+                updatePeriodAndResult();
+            }
+        }, 1000);
+
+        // Generate random particles
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 100; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDuration = `${Math.random() * 3 + 2}s`; // Random duration for each particle
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+    </script>
+</body>
+</html>
