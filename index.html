@@ -69,66 +69,6 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
-
-        /* Popup Styles */
-        .popup {
-            display: none;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.5s;
-        }
-
-        .popup-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            animation: slideIn 0.5s;
-        }
-
-        .close-btn {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-
-        .close-btn:hover {
-            background-color: #ff1a1a;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Animation for closing popup */
-        .closing {
-            animation: fadeOut 0.5s forwards;
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
     </style>
 </head>
 <body>
@@ -143,15 +83,6 @@
         </div>
     </div>
 
-    <!-- Popup for displaying result -->
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <h2>Result Details</h2>
-            <p id="popupText"></p>
-            <button class="close-btn" id="closeBtn">Close</button>
-        </div>
-    </div>
-
     <script>
         // Sequence of results to display
         const resultsSequence = [
@@ -163,7 +94,6 @@
         ];
         let currentResultIndex = 0; // Track the current result index
         let lastPeriod = ""; // Track the last displayed period number
-        let hasShownResult = false; // Flag to track if result has been shown for the current period
         const history = []; // Store history entries
 
         // Function to add to history
@@ -184,24 +114,6 @@
             });
         }
 
-        // Show popup function
-        function showPopup(period, result) {
-            const popup = document.getElementById("popup");
-            const popupText = document.getElementById("popupText");
-            popupText.innerText = `Period: ${period}\nResult: ${result}`;
-            popup.style.display = 'flex'; // Show the popup
-        }
-
-        // Close popup function
-        function closePopup() {
-            const popup = document.getElementById("popup");
-            popup.classList.add('closing');
-            setTimeout(() => {
-                popup.style.display = 'none'; // Hide after animation
-                popup.classList.remove('closing');
-            }, 500); // Match the animation duration
-        }
-
         // Start timer function
         function startTimer() {
             setInterval(() => {
@@ -219,29 +131,18 @@
                 const formattedTime = `  ${0}  :  ${String(remainingSeconds).padStart(2, '0')}`.replace(/(?<=\d)(?=\d)/g, " ");
                 document.getElementById("timerDisplay").innerText = formattedTime;
 
-                // Show result if period changes and hasn't been shown yet
+                // Show result if period changes
                 if (lastPeriod !== periodNumber) {
                     lastPeriod = periodNumber; // Update last period
                     const result = resultsSequence[currentResultIndex]; // Get current result
                     document.getElementById("resultDisplay").innerText = `Result: ${result}`; // Display result
                     addToHistory(periodNumber, result); // Add to history
                     
-                    // Show the popup with result
-                    showPopup(periodNumber, result);
-                    
                     // Move to the next result in the sequence
                     currentResultIndex = (currentResultIndex + 1) % resultsSequence.length; // Cycle through results
-                    hasShownResult = false; // Reset the flag for the next period
-                } else if (!hasShownResult) {
-                    // Only show the popup if it hasn't been shown for this period
-                    showPopup(periodNumber, resultsSequence[currentResultIndex]);
-                    hasShownResult = true; // Mark as shown
                 }
             }, 1000); // Update every second
         }
-
-        // Close button event listener
-        document.getElementById("closeBtn").addEventListener("click", closePopup);
 
         // Start the timer
         startTimer();
