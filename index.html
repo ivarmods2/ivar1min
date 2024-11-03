@@ -3,240 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Timer</title>
+    <title>Result Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
-            background: #000; /* Dark background */
-            color: #fff;
         }
 
         .container {
-            position: relative;
-            text-align: center;
-            width: 90%;
-            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            background-color: rgba(20, 20, 20, 0.8);
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            width: 350px;
+            text-align: center;
         }
 
-        /* Neon text and border effect */
-        .neon-border {
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 3px solid #ff007f; /* Neon border */
-            box-shadow: 0 0 15px #ff007f, 0 0 25px #ff007f, 0 0 35px #ff007f, 0 0 45px #ff007f;
-            color: white;
-            font-weight: bold;
-            background-color: rgba(25, 25, 25, 0.9);
-        }
-
-        /* Title with neon effect */
         .title {
-            font-size: 2.5rem;
-            color: #ff007f; /* Neon pink */
-            font-weight: bold;
+            font-size: 2rem;
             margin-bottom: 20px;
-            animation: glow 1.5s ease-in-out infinite alternate;
-            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
         }
 
-        /* Upper bottom text styling */
-        .upper-bottom-text {
-            font-size: 1.5rem; /* Adjust font size as needed */
-            color: #ff007f; /* Neon pink */
-            margin: 20px 0; /* Space above and below */
-            animation: glow 1.5s ease-in-out infinite alternate;
-            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
-        }
-
-        /* History box styling */
-        .history {
-            width: 92%; /* Adjusted width to 92% */
-            max-height: 150px;
-            overflow-y: auto;
-            border: 3px solid #ff007f;
-            border-radius: 8px;
+        .box {
             padding: 10px;
-            background-color: rgba(20, 20, 20, 0.9);
-            box-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
+            margin: 5px 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.2rem;
+        }
+
+        .history {
+            max-height: 140px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #333;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .history-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px;
-            margin: 5px 0;
-            color: #fff;
-            background-color: rgba(40, 40, 40, 0.8);
-            border-radius: 4px;
+            border-bottom: 1px solid #ccc;
+            padding: 5px 0;
         }
 
-        /* Neon effect for footer text */
-        .footer-text {
-            font-size: 1.2rem;
-            color: #ff007f; /* Neon pink */
-            margin-top: 20px;
-            animation: glow 1.5s ease-in-out infinite alternate;
-            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
+        .history-item:last-child {
+            border-bottom: none;
         }
 
-        /* Neon particles */
-        .particles {
-            position: absolute;
-            top: 0;
+        .history-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            z-index: -1;
-            pointer-events: none;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
         }
 
-        .particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: radial-gradient(circle, #ff007f, transparent);
-            border-radius: 50%;
-            animation: float 5s ease-in-out infinite;
-            opacity: 0.8;
+        .popup-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideIn 0.5s;
         }
 
-        /* Particle floating animation */
-        @keyframes float {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 0.8;
-            }
-            50% {
-                transform: translateY(-30px) scale(1.2);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0) scale(1);
-                opacity: 0.8;
-            }
+        .close-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 10px;
         }
 
-        /* Particle movement animation */
-        @keyframes move {
-            from {
-                transform: translateY(0) translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(100vh) translateX(50px);
-                opacity: 0;
-            }
+        .close-btn:hover {
+            background-color: #ff1a1a;
         }
 
-        /* Title neon glow animation */
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f;
-            }
-            to {
-                text-shadow: 0 0 20px #ff007f, 0 0 30px #ff007f, 0 0 40px #ff007f;
-            }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Animation for closing popup */
+        .closing {
+            animation: fadeOut 0.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
     </style>
 </head>
 <body>
-    <div class="particles"></div>
-
     <div class="container">
-        <div class="title">IVAR ULTIMATE</div>
-
-        <div class="upper-bottom-text">1 MIN WINGO</div> <!-- New upper bottom text -->
-
-        <div class="neon-border">Period Number: <span id="periodNumber">Loading...</span></div>
-        <div class="neon-border">Timer: <span id="timer">00 : 00</span></div>
-        <div class="neon-border">Result: <span id="result">Waiting...</span></div>
-
+        <h1 class="title">Result Predictor</h1>
+        <div id="periodDisplay" class="box">Period: </div>
+        <div id="timerDisplay" class="box">Timer: 00 : 00</div>
+        <div id="resultDisplay" class="box">Result: </div>
         <div class="history">
-            <strong>History</strong>
-            <div id="historyList"></div>
+            <div class="history-title">History:</div>
+            <div id="historyContainer"></div>
         </div>
+    </div>
 
-        <!-- Footer Text -->
-        <div class="footer-text">PRESENT BY IVAR</div>
+    <!-- Popup for displaying result -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <h2>Result Details</h2>
+            <p id="popupText"></p>
+            <button class="close-btn" id="closeBtn">Close</button>
+        </div>
     </div>
 
     <script>
-        const periodNumber = document.getElementById("periodNumber");
-        const timerDisplay = document.getElementById("timer");
-        const resultDisplay = document.getElementById("result");
-        const historyList = document.getElementById("historyList");
+        // Sequence of results to display
+        const resultsSequence = [
+            "SMALL", "BIG", "SMALL", "SMALL", "SMALL", "BIG",
+            "SMALL", "BIG", "BIG", "SMALL", "SMALL", "BIG",
+            "SMALL", "SMALL", "BIG", "SMALL", "BIG", "SMALL",
+            "SMALL", "BIG", "BIG", "BIG", "BIG", "BIG",
+            "SMALL", "SMALL", "BIG"
+        ];
+        let currentResultIndex = 0; // Track the current result index
+        let lastPeriod = ""; // Track the last displayed period number
+        let hasShownResult = false; // Flag to track if result has been shown for the current period
+        const history = []; // Store history entries
 
-        const resultsArray = ["SMALL", "SMALL", "BIG", "SMALL", "SMALL", "BIG", "BIG", "BIG", "BIG", "SMALL", "BIG", "SMALL", "BIG", "SMALL", "SMALL", "SMALL"];
-        let lastPeriod = null;
-
-        // Function to update period and display result
-        function updatePeriodAndResult() {
-            const now = new Date();
-            const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
-            const period = 10001 + totalMinutes;
-            const newPeriodNumber = `${now.toISOString().slice(0, 10).replace(/-/g, '')}1000${period}`;
-
-            if (newPeriodNumber !== lastPeriod) {
-                lastPeriod = newPeriodNumber;
-                periodNumber.textContent = newPeriodNumber;
-
-                // Randomly select a result for each new period
-                const randomIndex = Math.floor(Math.random() * resultsArray.length);
-                const result = resultsArray[randomIndex];
-                resultDisplay.textContent = result;
-
-                // Add result to history
-                const historyItem = document.createElement("div");
-                historyItem.className = "history-item";
-                historyItem.innerHTML = `<span>Period: ${newPeriodNumber}</span><span>Result: ${result}</span>`;
-                historyList.prepend(historyItem);
-            }
+        // Function to add to history
+        function addToHistory(period, result) {
+            history.push({ period, result });
+            updateHistoryDisplay();
         }
 
-        // Timer update function
-        function updateTimer() {
-            const now = new Date();
-            const seconds = now.getUTCSeconds();
-            const remainingSeconds = 60 - seconds;
-            timerDisplay.textContent = `00 : ${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds}`;
+        // Function to update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById("historyContainer");
+            historyContainer.innerHTML = ""; // Clear current history
+            history.forEach(entry => {
+                const div = document.createElement("div");
+                div.className = "history-item";
+                div.innerHTML = `<span>${entry.period}</span><span>${entry.result}</span>`;
+                historyContainer.appendChild(div);
+            });
         }
 
-        // Run update every second
-        setInterval(() => {
-            updateTimer();
-            if (new Date().getUTCSeconds() === 0) {
-                updatePeriodAndResult();
-            }
-        }, 1000);
-
-        // Generate random particles
-        function createParticles() {
-            const particlesContainer = document.querySelector('.particles');
-            for (let i = 0; i < 100; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                particle.style.top = `${Math.random() * 100}vh`;
-                particle.style.left = `${Math.random() * 100}vw`;
-                particle.style.animationDuration = `${Math.random() * 3 + 2}s`; // Random duration for each particle
-                particlesContainer.appendChild(particle);
-            }
+        // Show popup function
+        function showPopup(period, result) {
+            const popup = document.getElementById("popup");
+            const popupText = document.getElementById("popupText");
+            popupText.innerText = `Period: ${period}\nResult: ${result}`;
+            popup.style.display = 'flex'; // Show the popup
         }
 
-        createParticles();
+        // Close popup function
+        function closePopup() {
+            const popup = document.getElementById("popup");
+            popup.classList.add('closing');
+            setTimeout(() => {
+                popup.style.display = 'none'; // Hide after animation
+                popup.classList.remove('closing');
+            }, 500); // Match the animation duration
+        }
+
+        // Start timer function
+        function startTimer() {
+            setInterval(() => {
+                const calendar = new Date(); // Get current date/time
+                const seconds = calendar.getUTCSeconds();
+                const remainingSeconds = 60 - seconds; // Calculate remaining seconds
+                const minutes = calendar.getUTCMinutes();
+                const totalMinutes = calendar.getUTCHours() * 60 + minutes;
+
+                // Update period number for 1-minute interval
+                const periodNumber = `${calendar.getUTCFullYear()}${String(calendar.getUTCMonth() + 1).padStart(2, '0')}${String(calendar.getUTCDate()).padStart(2, '0')}1000${10001 + totalMinutes}`;
+                document.getElementById("periodDisplay").innerText = `Period: ${periodNumber}`;
+
+                // Update timer display in the format "  x x  :  x x"
+                const formattedTime = `  ${0}  :  ${String(remainingSeconds).padStart(2, '0')}`.replace(/(?<=\d)(?=\d)/g, " ");
+                document.getElementById("timerDisplay").innerText = formattedTime;
+
+                // Show result if period changes and hasn't been shown yet
+                if (lastPeriod !== periodNumber) {
+                    lastPeriod = periodNumber; // Update last period
+                    const result = resultsSequence[currentResultIndex]; // Get current result
+                    document.getElementById("resultDisplay").innerText = `Result: ${result}`; // Display result
+                    addToHistory(periodNumber, result); // Add to history
+                    
+                    // Show the popup with result
+                    showPopup(periodNumber, result);
+                    
+                    // Move to the next result in the sequence
+                    currentResultIndex = (currentResultIndex + 1) % resultsSequence.length; // Cycle through results
+                    hasShownResult = false; // Reset the flag for the next period
+                } else if (!hasShownResult) {
+                    // Only show the popup if it hasn't been shown for this period
+                    showPopup(periodNumber, resultsSequence[currentResultIndex]);
+                    hasShownResult = true; // Mark as shown
+                }
+            }, 1000); // Update every second
+        }
+
+        // Close button event listener
+        document.getElementById("closeBtn").addEventListener("click", closePopup);
+
+        // Start the timer
+        startTimer();
     </script>
 </body>
 </html>
